@@ -1,0 +1,378 @@
+{% load static %}
+
+{% load forum_extras %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=12.0, minimum-scale=.05, user-scalable=yes">
+	<meta name="description" content="{{ forum_settings.FORUM_META_DESCRIPTION }} " />
+	<meta name="keywords" content="{{ forum_settings.FORUM_META_KEYWORDS }}" />
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="author" content="Doldol, The Unforgotten">
+
+	<link rel="preload" as="font" href="{% static "fonts/fontawesome-webfont.woff2" %}">
+	<link rel="preload" as="font" href="{% static "fonts/glyphicons-halflings-regular.woff2" %}">
+	<link rel="preload" as="font" href="{% static "fonts/CGFLocustResistance.woff" %}">    
+	<link rel="preload" as="image" href="{% static "img/header_txt.svg" %}">
+
+	<title>{% block title %}{% endblock %} {{ forum_settings.FORUM_BASE_TITLE }}</title>
+
+	<!-- Bootstrap Core CSS -->
+	<link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
+	<link href="{% static "css/font-awesome.min.css" %}" rel="stylesheet">
+
+	<!-- Custom CSS -->
+	<link href="{% static "css/bootstrap-theme.css" %}" rel="stylesheet">
+	<link href="{% static "css/site-style-base.css" %}" rel="stylesheet">
+
+	{% load staticfiles %}
+
+	<link rel="alternate" type="application/atom+xml" href="{% url 'djangobb:forum_posts_feed' %}" title="{% trans "Latest posts on forum" %}" />
+	<link rel="alternate" type="application/atom+xml" href="{% url 'djangobb:forum_topics_feed' %}" title="{% trans "Latest topics on forum" %}" />
+
+	<link rel="shortcut icon" href="{{ STATIC_URL }}djangobb_forum/favicon.png" type="image/png" />
+	<script type="text/javascript">
+		var STATIC_URL = "{{ STATIC_URL }}";
+		var POST_PREVIEW_URL = "{% url 'djangobb:post_preview' %}";
+	</script>
+
+	<!-- Highlightjs goodies -->
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}djangobb_forum/css/pygments.css" />
+	{% if highlight_word %}
+		<script type="text/javascript" src="{{ STATIC_URL }}djangobb_forum/js/jquery.highlight-3.pack.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				$("div.postmsg").highlight("{{ highlight_word }}");
+			});
+		</script>
+	{% endif %}
+	{% block extra_meta %}{% endblock %}
+
+</head>
+<body>
+
+	<div id="wrapper">
+		<!-- Left Sidebar -->
+		<div id="left-sidebar-wrapper">
+			<ul class="sidebar-nav">
+				<li class="sidebar-brand">
+				 
+				</li>
+				{% block menu %}
+				<li>
+					<a data-toggle="collapse" href="#dashboard" aria-expanded="false">                        
+						<span class="fa-stack fa-lg pull-left">
+							<i class="fa fa-server fa-stack-1x"></i>
+						</span>
+						{% trans "Forum" %}<i class="fa fa-caret-down" aria-hidden="true"></i>
+					</a>
+					<div class="collapse sub-bar" id="dashboard">
+						<a id="navindex" href="{% url 'djangobb:index' %}">{% trans "Index" %}</a>
+						<a href="{% url 'djangobb:search' %}?action=show_24h">{% trans "Show recent posts" %}</a>
+						<a href="{% url 'djangobb:search' %}?action=show_unanswered">{% trans "Show unanswered posts" %}</a>
+						{% if user.is_authenticated %}
+							<a href="{% url 'djangobb:search' %}?action=show_new">{% trans "Show new posts since last visit" %}</a>
+							<a href="{% url 'djangobb:misc' %}?action=markread">{% trans "Mark all topics as read" %}</a>
+							<a href="{% url 'djangobb:search' %}?action=show_subscriptions">{% trans "Show your subscribed topics" %}</a>
+							<a href="{% url 'djangobb:search' %}?action=show_user&amp;show_as=topics">{% trans "Show your" %}&nbsp;{% trans "topics" %}</a>
+							<a href="{% url 'djangobb:search' %}?action=show_user&amp;show_as=posts">{% trans "Show your" %}&nbsp;{% trans "posts" %}</a>
+						{% endif %}
+					</div>
+				</li>
+				<li>
+					 <a id="navuserlist" href="{% url 'djangobb:forum_users' %}">
+						<span class="fa-stack fa-lg pull-left">
+							<i class="fa fa-wrench fa-stack-1x"></i>
+						</span>
+					   {% trans "User list" %}
+					</a>
+				</li>
+				<li>
+					 <a id="navsuggestions" href="{% url 'suggestions:index' %}">
+						<span class="fa-stack fa-lg pull-left">
+							<i class="fa fa-wrench fa-stack-1x"></i>
+						</span>
+					   {% trans "Suggestions" %}
+					</a>
+				</li>
+				{% if user.is_authenticated %}
+					<li>
+						<a id="navprofile" href="{% url 'djangobb:forum_profile' request.user %}">
+							<span class="fa-stack fa-lg pull-left">
+								<i class="fa fa-wrench fa-stack-1x"></i>
+							</span>
+							{% trans "Profile" %}
+						</a>
+					</li>
+					{% if forum_settings.PM_SUPPORT %}
+						<li>
+							<a id="navpm" href="{% url 'messages_inbox' %}">
+								<span class="fa-stack fa-lg pull-left">
+									<i class="fa fa-wrench fa-stack-1x"></i>
+								</span>
+								{% trans "PM" %}
+							</a>
+						</li>
+					{% endif %}
+					<li>
+						<a id="navlogout" href="{% url 'account_logout' %}?next={{ request.path }}">
+							<span class="fa-stack fa-lg pull-left">
+								<i class="fa fa-wrench fa-stack-1x"></i>
+							</span>
+							{% trans "Log out" %}
+						</a>
+					</li>
+				{% else %}
+				<li>
+					<a href="{% url 'account_login' %}">
+						<span class="fa-stack fa-lg pull-left">
+							<i class="fa fa-server fa-stack-1x"></i>
+						</span>
+						{% trans "Log in" %}
+					</a>
+				</li>
+				<li>
+					<a href="{% url 'account_signup' %}">
+						<span class="fa-stack fa-lg pull-left">
+							<i class="fa fa-server fa-stack-1x"></i>
+						</span>
+						{% trans "Sign up" %}
+					</a>
+				</li>
+				{% endif %}
+				{% endblock %}
+			</ul>
+		</div>
+
+		<!-- Right Sidebar -->
+		<div id="right-sidebar-wrapper">
+			<ul class="sidebar-nav">
+				<li class="sidebar-brand">
+					
+				</li>
+				{% if user.is_authenticated %}
+					<li>
+						<a id="navlogout" href="{% url 'account_logout' %}?next={{ request.path }}">
+							<span class="fa-stack fa-lg pull-left">
+								<i class="fa fa-sign-out fa-stack-1x" aria-hidden="true"></i>
+							</span>
+							{% trans "Log out" %}
+						</a>
+					</li>
+				{% else %}
+					<li style="background-color: rgb(155,0,0)">
+						<a id="navlogin" href="{% url 'account_login' %}">
+							<span class="fa-stack fa-lg pull-left">
+								<i class="fa fa-sign-in fa-stack-1x" aria-hidden="true"></i>
+							</span>
+							{% trans "Log in" %}/{% trans "Sign up" %}
+						</a>
+					</li>
+				{% endif %}
+				<li>
+					<a id="navsearch" href="{% url 'djangobb:search' %}">
+						<span class="fa-stack fa-lg pull-left">
+							<i class="fa fa-search fa-stack-1x"></i>
+						</span>
+						{% trans "Search" %}
+					</a>
+				</li>
+				<li>
+					<a data-toggle="collapse" href="#recent-search" aria-expanded="false">
+						<span class="fa-stack fa-lg pull-left">
+							<i class="fa fa-search fa-stack-1x"></i>
+						</span>
+						Recent Search <span class="caret"></span>
+					</a>
+					
+					<div class="collapse sub-bar" id="recent-search">
+						<a href="#">Keyword 1</a>
+						<a href="#">Keyword 2</a>
+						<a href="#">Keyword 3</a>
+						<a href="#">Keyword 4</a>
+					</div>
+				</li>
+				{% if user.is_superuser %}
+				<li>
+					<a id="navadmin" href="{% url 'admin:index' %}">
+						<span class="fa-stack fa-lg pull-left">
+							<i class="fa fa-search fa-stack-1x"></i>
+						</span>
+						{% trans "Administration" %}
+					</a>
+				</li>
+				{% endif %}
+		</div>
+
+		<div id="page-vertical-wrapper">
+			<header>
+				<span>
+					<object data="{% static "img/header_txt.svg" %}" type="image/svg+xml">
+						<h1>The Unforgotten</h1>
+					</object>
+				</span>
+			</header>
+
+			<!-- Head -->
+			<div style="min-height:204px">
+			<div id="page-head-wrapper" data-spy="affix" data-offset-top="150">
+
+				<div></div>
+
+				<nav class="navbar navbar-mystyle navbar-top">
+					<div class="navbar-header">
+					  <button type="button" class="navbar-toggle collapsed btn btn-default" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+						<span class="sr-only">Toggle navigation</span>
+						<i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+					  </button>
+					</div>
+					<div id="navbar" class="navbar-collapse collapse">
+					  <ul class="nav navbar-nav">
+						<li><a href="#left-menu-toggle" class="btn btn-link btn-md" id="left-menu-toggle"><span class="fa fa-align-left" aria-hidden="true"></span></a></li>
+										<!-- Toggle Buttons -->
+					  </ul>
+					  <ul class="nav navbar-nav navbar-right">
+						<li><a href="#right-menu-toggle" class="btn btn-link btn-md" id="right-menu-toggle"><span class="fa fa-align-right" aria-hidden="true"></span></a></li>
+					  </ul>
+					</div>
+				</nav>
+
+			</div>
+			</div>
+
+			<!-- Page Content -->
+			<div id="page-content-wrapper">
+
+				<div class="container-fluid">
+					<div id="django-msg-wrapper">
+					{% include 'djangobb_forum/header.html' %}
+					{% block messages %}
+						{% for message in messages %}
+							<div class="alert alert-dismissible alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}">
+								<button type="button" class="close" data-dismiss="alert">&times;</button>		 
+								<h4>{% trans "Notice" %}</h4>
+								<p>{{ message }}</p>
+							</div>
+						{% endfor %}
+					{% endblock messages %}
+					</div>
+
+					{% block pre_content %}{% endblock %}
+					{% block content %}{% endblock %}
+					{% block post_content %}{% endblock %}
+
+					<div class="row">
+						<div class="col-sm-4">
+							<p class="text-center">Website by <a href="http://steamcommunity.com/profiles/76561197988220707/">Doldol</a></p>
+						</div>
+						<div class="col-sm-4">
+							<p class="text-center">{% block controls %}{% endblock controls %}</p>
+						</div>
+						<div class="col-sm-4">
+							{% block lofi %}{% endblock lofi%}
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+			<!-- /#page-content-wrapper -->
+	</div>
+	<!-- /#wrapper -->
+
+	<!-- 3rd Party Libs -->
+	{% block afterbody %}{% endblock afterbody %}
+	<script src="{% static "js/jquery-3.1.0.min.js" %}"></script>	
+	<script src="{% static "js/jquery.mobile.touch.min.js" %}"></script>
+	<script src="{% static "js/bootstrap-3.3.7.min.js" %}"></script>
+	<script src="{% static "js/ResizeSensor.js" %}"></script>
+
+	{% if user.is_authenticated %}
+		{% if post %}
+			{% with markup=post.markup %}
+				{% include "djangobb_forum/includes/markup_editor.html" %}
+			{% endwith %}
+		{% else %}
+			{% with markup=user.forum_profile.markup %}
+				{% include "djangobb_forum/includes/markup_editor.html" %}
+			{% endwith %}
+		{% endif %}
+	{% endif %}
+
+
+	<!-- Script -->
+	<script>
+	$(document).ready(function(){
+		$('[data-toggle="tooltip"]').tooltip();   
+	});
+	
+	$("#right-sidebar-wrapper").on("swipeleft",function(){
+		$("#wrapper").prop("classList").add("right-toggled");
+	});
+	$("#right-sidebar-wrapper").on("swiperight",function(){
+		$("#wrapper").prop("classList").remove("right-toggled");
+		$('#right-sidebar-wrapper .collapse').collapse('hide');
+	});
+
+	$("#left-sidebar-wrapper").on("swiperight",function(){
+		$("#wrapper").prop("classList").add("left-toggled");
+	});
+	$("#left-sidebar-wrapper").on("swipeleft",function(){
+		$("#wrapper").prop("classList").remove("left-toggled");
+		$('#left-sidebar-wrapper .collapse').collapse('hide');
+	});
+
+	$(".collapse").on('show.bs.collapse', function(){
+		if ($(this).closest('#left-sidebar-wrapper').length) {
+			$("#wrapper").prop("classList").add("left-toggled");
+		} else if ($(this).closest('#right-sidebar-wrapper').length) {
+			$("#wrapper").prop("classList").add("right-toggled");
+		}
+	});
+
+	$("#left-menu-toggle").click(function(e) {
+		e.preventDefault();
+		$("#wrapper").toggleClass("left-toggled");
+		$('#left-sidebar-wrapper .collapse').collapse('hide');
+	});
+
+	$("#right-menu-toggle").click(function(e) {
+		e.preventDefault();
+		$("#wrapper").toggleClass("right-toggled");
+		$('#right-sidebar-wrapper .collapse').collapse('hide');
+	});
+
+	var $affixElement = $('div[data-spy="affix"]');
+	new ResizeSensor($affixElement.parent(), function() {
+		$affixElement.width($affixElement.parent().width());
+	});
+
+	$(window).resize(function () {
+		var $affixElement = $('div[data-spy="affix"]');
+		$affixElement.width($affixElement.parent().width());
+	});
+
+	$(window).scroll(function(){
+		var scrlOff = $(window).scrollTop();
+		if (scrlOff > 150) {
+			$("#wrapper").css("background-position", "center -150px");
+			$("#page-content-wrapper").css("background-position", "center -150px");
+		} else {
+			$("#page-content-wrapper").css("background-position", "center -"+scrlOff.toString()+"px");
+			$("#wrapper").css("background-position", "center -"+scrlOff.toString()+"px");
+		}
+	});
+	</script>
+
+	{% block afterscript %}{% endblock afterscript %}
+
+</body>
+
+</html>

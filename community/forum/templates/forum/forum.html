@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load base_tags %}
+
+{% block title %}Forum Index{% endblock %}
+
+
+{% block content %}
+<div class="row">
+	<div class="col-sm-12">
+		<div class="btn-group btn-breadcrumb">
+	        <a href="{% url 'forum:index' %}"><i class="fa fa-home" aria-hidden="true"></i> {% trans "Forums" %}</a>
+	        {% for page in nav_help %}
+	        	<a href="{{ page.get_absolute_url }}">
+					{% if page.icon %}
+						<img src="{{ page.icon.url }}" style="max-width: 14px;max-height:14px;" />
+					{% endif %}
+		        	{{ page.title }}
+	        	</a>
+			{% endfor %}
+	        <a href="{{ request.get_full_path }}">
+				{% if page.icon %}
+					<img src="{{ forum.icon.url }}" style="max-width: 14px;max-height:14px;" />
+				{% endif %}
+		       	{{ forum.title }}
+	        </a>
+	    </div>
+    </div>
+</div>
+
+<div class="row">
+	<div class="col-sm-12">
+		<div class="panel-group">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="pull-right" style="padding-top: 8px;">
+								<div class="btn-toolbar nomargin" role="toolbar">
+									<div class="btn-group">
+								        {% include 'util/paginator.html' with page=topic_struct_page request=request only %}
+								    </div>
+								    <div class="btn-group pull-right">
+								        {% if user.is_authenticated %}<a href="% url 'forum:add_topic' forum.id %" class="btn btn-default">{% trans "New topic" %}</a>{% endif %}
+								    </div>
+								</div>
+							</div>
+							<h3>
+								{% if page.icon %}<img src="{{ forum.icon.url }}" style="max-width: 24px;max-height:24px;position: absolute;top: 7%;transform: translate(25%, -7%);" />{% endif %}<strong>{{ forum.title }}</strong>
+								<p><small>{{ forum.description|safe }}</small></p>
+							</h3>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% if forum_struct_page %}
+<div class="row">
+	<div class="col-sm-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+			{% trans "Sub Forums" %}
+			</div>
+			<div class="panel-body">
+				{% for forum in forum_struct_page %}
+					<div class="row">
+						<div class="col-sm-8">
+							<div style="float: left; width: 50px;height: 50px;position:relative">
+					            {% if forum.icon %}
+									<img src="{{ forum.icon.url }}" style="max-width: 50px;max-height:50px;right: 25%;position: absolute;top: 7%;transform: translate(25%, -7%);" />
+					            {% else %}
+									<span class="nosize"><!-- --></span>
+					            {% endif %}
+					        </div>
+					        <div style="float: left;border-right: 1px solid rgba(255,255,255, .1);height: 46px;width: 7px;margin-top:2px"></div>
+							<div style="display: block; margin-left: 62px;min-height: 50px;">
+									<strong><a href="{{ forum.get_absolute_url }}">{{ forum.title }}</a></strong>
+									<p><small>{{ forum.description|safe }}
+									</small></p>
+							</div>
+						</div>
+						<div class="col-sm-4 hidden-xs">
+							<div style="float: left; width: 55px;height: 50px;position:relative">
+								<span data-toggle="tooltip" data-placement="top" title="{% trans "Topics" %}"><i class="fa fa-reply-all" aria-hidden="true"></i>&nbsp;{{ forum.topic_count }}</span>
+								<br>
+								<span data-toggle="tooltip" data-placement="top" title="{% trans "Posts" %}"><i class="fa fa-comments-o" aria-hidden="true"></i>&nbsp;{{ forum.post_count }}</span>
+							</div>
+							{% if forum.updated %}
+								{% if forum.last_post.topic %}
+									<div style="display: block; margin-left: 62px;min-height: 50px;">
+										<i class="fa fa-comment-o" aria-hidden="true"></i>&nbsp;<a data-toggle="tooltip" data-placement="top" title="{% trans "Latest Post in" %}" href="{{ forum.lastest_topic.get_absolute_url }}">{{ forum.lastest_topic.title }}</a><small>&nbsp;{% trans "by" %}&nbsp;{{ forum.lastest_topic.author|preferred_name}}</small>
+										<p><small>{{forum.last_post.created}}</small></p>
+									</div>
+								{% endif %}
+							{% endif %}
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}
+
+<div class="row">
+	<div class="col-sm-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+			{% trans "Topics" %}
+			</div>
+			<div class="panel-body">
+				{% for topic in topic_struct_page %}
+					<div class="row">
+						<div class="col-sm-8">
+							<div style="float: left; width: 50px;height: 50px;position:relative"><div class="nosize"><!-- --></div></div>
+					        <div style="float: left;border-right: 1px solid rgba(255,255,255, .1);height: 46px;width: 7px;margin-top:2px"></div>
+							<div style="display: block; margin-left: 62px;min-height: 50px;">
+	                            <a href="{{ topic.get_absolute_url }}">{{ topic.title }}</a> 
+	                            <p><small><span class="byuser">{% trans "by" %} {{ topic.author|preferred_name }}</span></small></p>
+							</div>
+						</div>
+						<div class="col-sm-4 hidden-xs">
+							<div style="float: left; width: 55px;height: 50px;position:relative">
+								<span data-toggle="tooltip" data-placement="top" title="{% trans "Replies" %}"><i class="fa fa-reply-all" aria-hidden="true"></i>&nbsp;{{ topic.post_count }}</span>
+								<br>
+								<span data-toggle="tooltip" data-placement="top" title="{% trans "Views" %}"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp; xx</span>
+							</div>
+
+							<div style="display: block; margin-left: 62px;min-height: 50px;">
+								<i class="fa fa-comment-o" aria-hidden="true"></i>&nbsp;
+									{% if topic.latest_post %}
+										<a data-toggle="tooltip" data-placement="top" title="{% trans "Latest Post in" %}" href="{{ topic.latest_post.get_absolute_url }}">{% trans "Last Post" %}</a><small>&nbsp;{% trans "by" %}&nbsp;{{ topic.latest_post.author|preferred_name }}</small>
+										<p><small>{{ topic.latest_post.created }}</small></p>
+									{% else %}
+										{% trans "No Posts" %}
+									{% endif %}
+							</div>
+						</div>
+					</div>
+				{% empty %}
+					<div class="row">
+						<div class="col-sm-12">
+							<h4>{% trans "No topics in forum." %}</h4>
+						</div>
+					</div>
+            	{% endfor %}
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="row">
+	<div class="col-sm-12">
+		<div class="panel-group">
+			<div class="panel panel-default">
+				<div class="panel-footer">
+					<div class="row">
+						<div class="col-sm-12">
+							{% if user.is_authenticated %}
+								<div class="pull-right">
+									<a href="% url 'forum:add_topic' forum.id %" class="btn btn-default">{% trans "New topic" %}</a>
+								</div>
+							{% endif %}
+							<div class="pull-left">{% include 'util/paginator.html' with page=topic_struct_page request=request only %}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

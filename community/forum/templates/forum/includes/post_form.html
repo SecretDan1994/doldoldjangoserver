@@ -1,0 +1,119 @@
+{% load i18n widget_tweaks %}
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="well bs-component">
+
+                <form class="form-horizontal" id="post" action="{{ form_url|default_if_none:"." }}" method="post" enctype="multipart/form-data">{% csrf_token %}
+
+                    {% if create_poll_form %}
+                    <script>{# TODO: move to html head! #}
+                        $(document).ready(function() {
+                            $('.poll .infldset').hide();
+                            $(".poll").click(function() {
+                                $('.poll .infldset').slideDown();
+                            });
+                        });
+                    </script>
+                    <fieldset>
+                        <legend>{% trans "Create a poll" %}</legend>
+                        {{ create_poll_form }}
+                    </fieldset>
+                    {% endif %}
+
+                    <fieldset>
+                        <legend>{% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}</legend>
+                        {% if forum %}
+                            {% if form.name.errors %}
+                                <div class="form-group error">
+                                    <label class="col-lg-1 control-label">{{ form.name.label }}</label> 
+                                    <div class="col-lg-11">{{ form.name }}
+                                        <span class="help-block">
+                                            {% for error in form.name.errors %}{{ error }}{% endfor %}
+                                        </span>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="form-group">
+                                    <label class="col-lg-1 control-label">{{ form.name.label }}</label> 
+                                    <div class="col-lg-11">{{ form.name|add_class:"form-control" }}
+                                        {% if form.name.help_text %}
+                                            <p class="help-block"><small>{{ form.name.help_text }}</small></p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+
+                            {% if form.body.errors %}
+                                <div class="form-group error">
+                                    <label class="col-lg-1 control-label">{{ form.body.label }}</label> 
+                                    <div class="col-lg-11">{{ form.body }}
+                                        <span class="help-block">
+                                            {% for error in form.body.errors %}{{ error }}{% endfor %}
+                                        </span>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="form-group">
+                                    <label class="col-lg-1 control-label">{{ form.body.label }}</label> 
+                                    <div class="col-lg-11">{{ form.body }}
+                                        {% if form.body.help_text %}
+                                            <p class="help-block"><small>{{ form.body.help_text }}</small></p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                        {% if forum_settings.ATTACHMENT_SUPPORT %}
+                            {% if form.attachment.errors %}
+                                <div class="form-group error">
+                                    <label class="col-lg-1 control-label">{{ form.attachment.label }}</label> 
+                                    <div class="col-lg-11">{{ form.attachment|add_class:"form-control" }}
+                                        <span class="help-inline">
+                                            {% for error in form.attachment.errors %}{{ error }}{% endfor %}
+                                        </span>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="form-group">
+                                    <label class="col-lg-1 control-label">{{ form.attachment.label }}</label> 
+                                    <div class="col-lg-11">{{ form.attachment|add_class:"form-control" }}
+                                        {% if form.attachment.help_text %}
+                                            <p class="help-inline"><small>{{ form.attachment.help_text }}</small></p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+
+
+                            <div class="form-group">
+                                <div class="col-lg-1"> </div> 
+                                <div class="col-lg-11">
+                                    <div class="checkbox">
+                                        <label>
+                                            {{ form.subscribe}}
+                                            {% if form.subscribe.help_text %}
+                                                {{ form.subscribe.help_text }}
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                    </fieldset>
+
+                    <div class="form-group">
+                        <div class="col-lg-11 col-lg-offset-1">
+                          <a class="btn btn-warning" href="{{ back_url|default_if_none:"javascript:history.go(-1)" }}">{% trans "Go back" %}</a>
+                          <button class="btn btn-default" type="reset">Cancel</button>
+                          <input class="btn btn-primary" type="submit" name="AddPostForm" value="Submit">
+                        </div>
+                    </div>
+
+                </form>
+            
+        </div>
+    </div>
+</div>

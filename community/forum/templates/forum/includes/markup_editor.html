@@ -1,0 +1,23 @@
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+
+<script>
+	window.jquery1_10_0 = jQuery.noConflict(true);
+</script>
+
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}djangobb_forum/css/wysibb/themes/wbbtheme.css" />
+<script type="text/javascript" src="{{ STATIC_URL }}djangobb_forum/js/wysibb/jquery.wysibb.js"></script>
+
+<script>
+	jquery1_10_0(function() {
+	  jquery1_10_0(".markup").wysibb();
+	})
+
+	$(document).ready(function($) {
+		$(".wysibb-text-editor").on('focus blur', function(){
+	     $(this).closest(".wysibb").toggleClass('wysibb-focused');
+		})
+		$(".wysibb-texarea").on('focus blur', function(){
+	     $(this).closest(".wysibb").toggleClass('wysibb-focused');
+		})
+	});
+</script>

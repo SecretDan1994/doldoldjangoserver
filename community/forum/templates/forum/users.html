@@ -1,0 +1,139 @@
+{% extends 'djangobb_forum/base.html' %}
+{% load forum_extras %}
+{% load i18n %}
+
+{% block content %}
+
+<style type="text/css">
+	.panel-table .panel-body{
+	  padding:0;
+	}
+
+	.panel-table .panel-body .table-bordered{
+	  border-style: none;
+	  margin:0;
+	}
+
+	.panel-table .panel-body .table-bordered > thead > tr > th:first-of-type {
+	  text-align:center;
+	  width: 100px;
+	}
+
+	.panel-table .panel-body .table-bordered > thead > tr > th:last-of-type,
+	.panel-table .panel-body .table-bordered > tbody > tr > td:last-of-type {
+	  border-right: 0px;
+	}
+
+	.panel-table .panel-body .table-bordered > thead > tr > th:first-of-type,
+	.panel-table .panel-body .table-bordered > tbody > tr > td:first-of-type {
+	  border-left: 0px;
+	}
+
+	.panel-table .panel-body .table-bordered > tbody > tr:first-of-type > td{
+	  border-bottom: 0px;
+	}
+
+	.panel-table .panel-body .table-bordered > thead > tr:first-of-type > th{
+	  border-top: 0px;
+	}
+</style>
+
+<div class="row">
+	<div class="col-sm-12">
+		<div class="btn-group btn-breadcrumb">
+	        <a class="active" href="{% url 'djangobb:forum_users' %}"><i class="fa fa-home" aria-hidden="true"></i> {% trans "User List" %}</a>
+	    </div>
+    </div>
+</div>
+
+<div class="row">
+	<div class="col-sm-12">
+		<div class="panel panel-default panel-table">
+			<div class="panel-heading" id="users1">
+				<div class="row">
+					<div class="col-sm-12">
+						<div class="pull-right" style="padding-top: 8px;">
+							<div class="btn-toolbar nomargin" role="toolbar">
+								<div class="btn-group">
+							        {% include 'djangobb_forum/paginator.html' with page=users_page request=request only %}
+							    </div>
+							</div>
+						</div>
+						<h3>
+							<strong>{% trans "User list" %}</strong>
+							<p><small>A list of all users registered on this website</small></p>
+						</h3>
+
+					</div>
+				</div>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-striped table-bordered table-list">
+					<thead>
+					<tr>
+						<th scope="col">{% trans "Username" %}</th>
+						<th scope="col">{% trans "Title" %}</th>
+						<th scope="col">{% trans "Posts" %}</th>
+						<th scope="col">{% trans "Registered" %}</th>
+					</tr>
+					</thead>
+					<tbody>
+					{% for profile in users_page %}
+						<tr>
+							<td>{{ profile|profile_link }}</td>
+							<td>{{ profile.forum_profile.status }}</td>
+							<td>{{ profile.forum_profile.post_count }}</td>
+							<td>{{ profile.date_joined|date:"d-m-Y" }}</td>
+						</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			<div class="panel-footer">
+				<div class="row">
+					<div class="col-sm-12">
+						<div class="pull-left">{% include 'djangobb_forum/paginator.html' with page=users_page request=request only %}</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="blockform">
+	<h2><span>{% trans "User search" %}</span></h2>
+	<div class="box">
+	<form method="get" id="userlist" action="">
+		<div class="inform">
+			<fieldset>
+				<legend>{% trans "Find and sort users" %}</legend>
+				<div class="infldset">
+					<label class="conl">{{ form.username.label }}<br />{{ form.username }}<br /></label>
+
+					<label class="conl">{{ form.sort_by.label }}
+					<br />
+					{{ form.sort_by }}
+					<br /></label>
+					<label class="conl">{{ form.sort_dir.label }}
+					<br />
+					{{ form.sort_dir }}
+					<br />
+					</label>
+					<p class="clearb">{% trans "Enter a username to search for. The username field can be left blank. Sort users by name, date registered or number of posts and in ascending/descending order." %}</p>
+				</div>
+			</fieldset>
+            <input type="submit" value="{% trans "Search" %}" />
+		</div>
+	</form>
+	</div>
+</div>
+<div class="linkst">
+	<div class="inbox">
+        
+	</div>
+</div>
+
+{% endblock %}
+
+{% block controls %}
+{% endblock %}

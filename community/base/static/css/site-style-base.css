@@ -1,0 +1,389 @@
+#wrapper {
+    padding-left: 0;
+    transition: all 0.5s ease, background-position 500ms;
+    background: url('../img/cuuuteeee.jpg') no-repeat;
+    background-attachment: fixed;
+    background-position: center 0px;
+}
+
+#wrapper.left-toggled {
+    padding-left: 250px;
+}
+
+#wrapper.right-toggled {
+    padding-right: 250px;
+}
+
+#left-sidebar-wrapper {
+    z-index: 1000;
+    position: fixed;
+    left: 250px;
+    width: 0;
+    height: 100%;
+    margin-left: -250px;
+    overflow-x: hidden;
+    background: #000;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#right-sidebar-wrapper {
+    z-index: 1000;
+    position: fixed;
+    right: 250px;
+    width: 0;
+    height: 100%;
+    margin-right: -250px;
+    overflow-x: hidden;
+    background: #000;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#wrapper.left-toggled #left-sidebar-wrapper {
+    width: 250px;
+}
+
+#wrapper.right-toggled #right-sidebar-wrapper {
+    width: 250px;
+}
+
+#page-vertical-wrapper {
+    width: 100%;
+    position: absolute;
+}
+
+#page-vertical-wrapper > header:first-child {
+    height: 150px;
+    width:100%;  
+    background: url(../img/cuuuteeee.jpg);
+    background-repeat: no-repeat;
+    background-position: center 0;
+    position: fixed;
+    left: 50%;
+    top: 0%;
+    z-index: 0;
+    transform: translateX(-50%);
+    display:table;
+}
+
+#page-vertical-wrapper > header:first-child span {
+    display:table-cell;
+    vertical-align:middle;
+    text-align:center;
+    background: url(../img/txtbg.png) center top no-repeat
+}
+
+
+#page-content-wrapper {
+    padding: 15px;
+    transition: 0s linear;
+    transition-property: background-position;
+    min-height:calc(100vh - 204px);
+    background-color: #272b30;
+    background: url('../img/cuuuteeee.jpg') no-repeat;
+    background-position: center 0px;
+    position:relative;
+    z-index:1;
+    background-attachment:fixed;
+}
+
+#page-head-wrapper {
+    z-index: 1001;
+}
+
+#page-head-wrapper > div:first-child {
+    height: 150px;
+    width:100%;
+}
+
+#wrapper.left-toggled #page-vertical-wrapper {
+    position: absolute;
+    margin-right: -250px;
+}
+
+#wrapper.right-toggled #page-vertical-wrapper {
+    position: absolute;
+}
+
+/* Sidebar Styles */
+
+.sidebar-nav {
+    position: absolute;
+    top: 0;
+    width: 250px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sidebar-nav li {
+    text-indent: 13px;
+    line-height: 40px;
+    border-bottom: 1px solid rgba(69, 74, 84, 0.7);
+}
+
+.sidebar-nav li a {
+    display: block;
+    text-decoration: none;
+    color: #999999;
+}
+
+.sidebar-nav li a:hover {
+    text-decoration: none;
+    color: #fff;
+    background: rgba(255,255,255,0.2);
+}
+
+.sidebar-nav li a:active,
+.sidebar-nav li a:focus {
+    text-decoration: none;
+}
+
+.sidebar-nav > .sidebar-brand {
+    height: 65px;
+    font-size: 18px;
+    line-height: 60px;
+}
+
+.sidebar-nav > .sidebar-brand a {
+    color: #999999;
+}
+
+.sidebar-nav > .sidebar-brand a:hover {
+    color: #fff;
+    background: none;
+}
+
+.navbar-nav {
+    margin-left: -15px;
+}
+
+/* Sub-bar styles */
+
+li > .sub-bar {
+    padding-left: 10px;
+    font-size: 0.85em;
+}
+
+.sub-bar > .sub-bar {
+    padding-left: 10px;
+    font-size: 0.95em;
+}
+
+/* Toggle Buttons */
+#left-menu-toggle {
+
+}
+
+#right-menu-toggle {
+
+}
+
+.affix {
+    top: -150px;
+}
+
+.affix + #page-content-wrapper {
+    padding-top: 215px;
+}
+
+.navbar{
+	margin-bottom: 0px;
+}
+
+.navbar-toggle{
+	float: left;
+	margin-left: 15px;
+}
+
+.navbar-mystyle {
+    background-image: none;
+	background-color: #000000;
+    opacity: 0.8;
+	border-color: #e7e7e7;
+	border-top: #131313 1px solid;
+	border-bottom: #e7e7e7 1px solid;
+	border-left: #131313 0px solid;
+	border-right: #131313 0px solid;
+	border-radius: 0px 0px 0px 0px;
+}
+
+.btn-breadcrumb {
+    display: inline-block;
+    /*box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.35);*/
+    overflow: hidden;
+    border-radius: 4px;
+    border: 1px solid rgba(0,0,0,0.6);
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+    margin-bottom: 20px;
+}
+
+.btn-breadcrumb a {
+    text-decoration: none;
+    outline: none;
+    display: block;
+    float: left;
+    line-height: 36px;
+    /*need more margin on the left of links to accomodate the numbers*/
+    padding: 0 10px 0 37px;
+    background: #666;
+    background: linear-gradient(#484e55, #3a3f44 60%, #313539);
+    position: relative;
+}
+/*since the first link does not have a triangle before it we can reduce the left padding to make it look consistent with other links*/
+.btn-breadcrumb a:first-child {
+    padding-left: 20px;
+    /*border-radius: 5px 0 0 5px; /*to match with the parent's radius*/
+}
+.btn-breadcrumb a:first-child:before {
+    left: 14px;
+}
+.btn-breadcrumb a:last-child {
+    /*border-radius: 0 5px 5px 0; this was to prevent glitches on hover*/
+    padding-right: 20px;
+}
+
+/*hover/active styles*/
+.btn-breadcrumb a.active, .btn-breadcrumb a:hover{
+    background: #333;
+    background: linear-gradient(#020202, #101112 40%, #141618);
+}
+.btn-breadcrumb a.active:after, .btn-breadcrumb a:hover:after {
+    background: #333;
+    background: linear-gradient(135deg, #020202, #101112 40%, #141618);
+}
+
+/*adding the arrows for the btn-breadcrumbs using rotated pseudo elements*/
+.btn-breadcrumb a:after {
+    content: '';
+    position: absolute;
+    top: 0; 
+    right: -18px; /*half of square's length*/
+    /*same dimension as the line-height of .btn-breadcrumb a */
+    width: 36px; 
+    height: 36px;
+    /*as you see the rotated square takes a larger height. which makes it tough to position it properly. So we are going to scale it down so that the diagonals become equal to the line-height of the link. We scale it to 70.7% because if square's: 
+    length = 1; diagonal = (1^2 + 1^2)^0.5 = 1.414 (pythagoras theorem)
+    if diagonal required = 1; length = 1/1.414 = 0.707*/
+    transform: scale(0.707) rotate(45deg);
+    /*we need to prevent the arrows from getting buried under the next link*/
+    z-index: 1;
+    /*background same as links but the gradient will be rotated to compensate with the transform applied*/
+    background: #666;
+    background: linear-gradient(135deg, #484e55, #3a3f44 60%, #313539);
+    /*stylish arrow design using box shadow
+    box-shadow: 
+        2px -2px 0 2px rgba(0, 0, 0, 0.4), 
+        3px -3px 0 2px rgba(255, 255, 255, 0.1);*/
+    /*conform to style:*/
+    box-shadow: 1px -1px 0 0.1px rgba(0, 0, 0, 1);
+
+    /*
+        5px - for rounded arrows and 
+        50px - to prevent hover glitches on the border created using shadows*/
+    border-radius: 0 5px 0 50px;
+}
+/*we dont need an arrow after the last link*/
+.btn-breadcrumb a:last-child:after {
+    content: none;
+}
+
+.nomargin {
+    margin: 0px !important;
+}
+
+/*site elements*/
+p.lofi {
+    text-align: center;
+}
+
+article {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+    margin-bottom: 14px;
+}
+
+article > aside.userinfo {
+    float: none;
+    vertical-align: top;
+    width: 100%;
+}
+
+article > .content {
+    margin-left: 0;
+}
+
+article > footer .postactions {
+    margin-left: 0;
+}
+
+@media(min-width:768px) {
+    #wrapper {
+        padding-left: 50px;
+        padding-right: 50px;
+    }
+
+    #wrapper.left-toggled {
+        padding-left: 250px;
+    }
+
+    #wrapper.right-toggled {
+        padding-right: 250px;
+    }
+
+    #left-sidebar-wrapper {
+        width: 50px;
+        opacity: 0.7;
+    }
+
+    #right-sidebar-wrapper {
+        width: 50px;
+        opacity: 0.7;
+    }
+
+    #wrapper.left-toggled #left-sidebar-wrapper {
+        width: 250px;
+    }
+
+    #wrapper.right-toggled #right-sidebar-wrapper {
+        width: 250px;
+    }
+
+    #page-content-wrapper {
+        padding: 20px;
+        transition: background-position 500ms ease;
+    }
+
+	.affix + #page-content-wrapper {
+	    padding-top: 220px;
+	}
+
+    #page-vertical-wrapper {
+        position: relative;
+    }
+
+    #wrapper.left-toggled #page-vertical-wrapper {
+        position: relative;
+        margin-right: 250;
+    }
+
+    #wrapper.right-toggled #page-vertical-wrapper {
+        position: relative;
+        margin-left: 250;
+    }
+
+    article > aside.userinfo {
+        display: table-cell;
+        box-sizing: border-box;
+        float: none;
+        vertical-align: top;
+        border-right: solid 1px #282f38;
+        width: 200px;
+    }
+}

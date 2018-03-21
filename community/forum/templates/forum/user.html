@@ -1,0 +1,218 @@
+{% extends 'djangobb_forum/base.html' %}
+{% load forum_extras %}
+{% load i18n %}
+
+{% block content %}
+
+<style type="text/css">
+	.tab-panel .nav-tabs > li > a {
+		border-radius: 4px 4px 0 0 ;
+	}
+
+	.tab-panel .tab-content .tab-pane > div {
+	  border-top-right-radius: 0px;
+	  border-top-left-radius: 0px;
+	  border-top: 0px;
+	}
+
+	.stacked-margin-form > .form-group {
+		margin-top: 0px;
+		margin-bottom: 0px;
+	}
+</style>
+
+<div class="row">
+	<div class="col-sm-12">
+		<div class="btn-group btn-breadcrumb">
+	        <a href="{% url 'djangobb:forum_users' %}"><i class="fa fa-home" aria-hidden="true"></i> {% trans "User List" %}</a>
+	        <a href="{% url 'djangobb:forum_profile' profile %}" class="active"><i class="fa fa-home" aria-hidden="true"></i> {{ profile }}{% trans "'s Profile" %}</a>
+	    </div>
+    </div>
+</div>
+
+<div class="row">
+	<div class="col-sm-12 tab-panel">
+		<ul class="nav nav-tabs">
+		  <li class="active"><a data-toggle="tab" href="#menu1">{% trans "Personal" %}</a></li>
+		  <li><a data-toggle="tab" href="#menu2">{% trans "Messaging" %}</a></li>
+		  <li><a data-toggle="tab" href="#menu3">{% trans "Personality" %}</a></li>
+		  <li><a data-toggle="tab" href="#menu4">{% trans "User activity" %}</a></li>
+		</ul>
+		<div class="tab-content">
+			<div id="menu1" class="tab-pane fade active in">
+					<div class="well">
+						<div class="form-horizontal stacked-margin-form">
+					        <div class="form-group">
+		                        <label class="col-lg-2 control-label">{% trans "Username:" %}</label> 
+		                        <div class="col-lg-10"><p class="form-control-static">{{ profile }}</p></div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-lg-2 control-label">{% trans "Status Title" %}</label> 
+		                        <div class="col-lg-10"><p class="form-control-static">
+		                        	{% if profile.forum_profile.status %}
+										{{ profile.forum_profile.status }}
+									{% else %}
+										{% trans "(None)" %}
+									{% endif %}
+		                        </p></div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-lg-2 control-label">{% trans "Real name:" %}</label> 
+		                        <div class="col-lg-10"><p class="form-control-static">
+		                        	{% if profile.first_name or profile.last_name %}
+										{{ profile.first_name }} {{ profile.last_name }}
+									{% else %}
+										{% trans "(Unknown)" %}
+									{% endif %}
+		                        </p></div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-lg-2 control-label">{% trans "Location" %}</label> 
+		                        <div class="col-lg-10"><p class="form-control-static">
+		                        	{% if profile.forum_profile.location %}
+										{{ profile.forum_profile.location }}
+									{% else %}
+										{% trans "(Unknown)" %}
+									{% endif %}
+		                        </p></div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-lg-2 control-label">{% trans "Website:" %}</label> 
+		                        <div class="col-lg-10"><p class="form-control-static">
+		                        	{% if profile.forum_profile.site %}
+										{{ profile.forum_profile.site|urlize }}
+									{% else %}
+										{% trans "(Unknown)" %}
+									{% endif %}
+		                        </p></div>
+		                    </div>
+		                    {% if forum_settings.USER_TO_USER_EMAIL %}
+			                    <div class="form-group">
+			                        <label class="col-lg-2 control-label">{% trans "E-mail:" %}</label> 
+			                        <div class="col-lg-10"><p class="form-control-static">
+				                        {% if profile.forum_profile.privacy_permission == 0 %}
+				                        	<a href="mailto:{{ profile.email }}">{{ profile.email }}</a>
+				                        {% else %}
+				                        	{% if profile.forum_profile.privacy_permission == 1 %}
+				                        		<a href="{% url 'djangobb:misc' %}?mail_to={{ profile }}">{% trans "Send e-mail" %}</a>
+				                        	{% else %}
+												{% trans "(Hidden)" %}
+											{% endif %}
+										{% endif %}
+									</p></div>
+			                    </div>
+			                {% endif %}
+		                </div>
+		            </div>
+			</div>
+		    <div id="menu2" class="tab-pane fade">
+					<div class="well">
+  						<div class="form-horizontal stacked-margin-form">
+				            <div class="form-group">
+	                            <label class="col-lg-2 control-label">{% trans "Jabber:" %}</label> 
+	                            <div class="col-lg-10"><p class="form-control-static">
+	                            	{% if profile.forum_profile.jabber %}
+										{{ profile.forum_profile.jabber }}
+									{% else %}
+										{% trans "(Unknown)" %}
+									{% endif %}
+	                            </p></div>
+	                        </div>
+	                        <div class="form-group">
+	                            <label class="col-lg-2 control-label">{% trans "ICQ:" %}</label> 
+	                            <div class="col-lg-10"><p class="form-control-static">
+	                            	{% if profile.forum_profile.icq %}
+										{{ profile.forum_profile.icq }}
+									{% else %}
+										{% trans "(Unknown)" %}
+									{% endif %}
+	                            </p></div>
+	                        </div>
+	                        <div class="form-group">
+	                            <label class="col-lg-2 control-label">{% trans "MSN Messenger:" %}</label> 
+	                            <div class="col-lg-10"><p class="form-control-static">
+	                            	{% if profile.forum_profile.msn %}
+										{{ profile.forum_profile.msn }}
+									{% else %}
+										{% trans "(Unknown)" %}
+									{% endif %}
+	                            </p></div>
+	                        </div>
+	                        <div class="form-group">
+	                            <label class="col-lg-2 control-label">{% trans "AOL IM:" %}</label> 
+	                            <div class="col-lg-10"><p class="form-control-static">
+	                            	{% if profile.forum_profile.aim %}
+										{{ profile.forum_profile.aim }}
+									{% else %}
+										{% trans "(Unknown)" %}
+									{% endif %}
+	                            </p></div>
+	                        </div>
+	                        <div class="form-group">
+	                            <label class="col-lg-2 control-label">{% trans "Yahoo! Messenger:" %}</label> 
+	                            <div class="col-lg-10"><p class="form-control-static">
+	                            	{% if profile.forum_profile.yahoo %}
+										{{ profile.forum_profile.yahoo }}
+									{% else %}
+										{% trans "(Unknown)" %}
+									{% endif %}
+	                            </p></div>
+	                        </div>
+	                    </div>
+					</div>
+		  </div>
+		  <div id="menu3" class="tab-pane fade">
+					<div class="well">
+						<div class="form-horizontal stacked-margin-form">
+				            <div class="form-group">
+	                            <label class="col-lg-2 control-label">{% trans "Avatar:" %}</label> 
+	                            <div class="col-lg-10"><p class="form-control-static">
+	                            	{% if profile.forum_profile.avatar %}
+										<img src="{{ profile.forum_profile.avatar.url }}" />
+									{% else %}
+										{% trans "(No avatar)" %}
+									{% endif %}
+	                            </p></div>
+	                        </div>
+	                        <div class="form-group">
+	                            <label class="col-lg-2 control-label">{% trans "Signature:" %}</label> 
+	                            <div class="col-lg-10"><p class="form-control-static">
+	                            	{% if profile.forum_profile.signature_html %}
+										{{ profile.forum_profile.signature_html|safe }}
+									{% else %}
+										{% trans "(Unknown)" %}
+									{% endif %}
+	                            </p></div>
+	                        </div>
+	                    </div>
+					</div>
+		  </div>
+		  <div id="menu4" class="tab-pane fade">
+					<div class="well">
+						<div class="form-horizontal stacked-margin-form">
+				            <div class="form-group">
+	                            <label class="col-lg-2 control-label">{% trans "Posts:" %}</label> 
+	                            <div class="col-lg-10"><p class="form-control-static">{{ profile.forum_profile.post_count }} - <a href="{% url 'djangobb:search' %}?action=show_user&amp;user_id={{ profile.id }}">{% trans "Show all posts" %}</a></p></div>
+	                        </div>
+				            <div class="form-group">
+	                            <label class="col-lg-2 control-label">{% trans "Last post:" %}</label> 
+	                            <div class="col-lg-10"><p class="form-control-static">
+		                        	{% if profile.forum_profile.last_post %}
+										{{ profile.forum_profile.last_post }}
+									{% else %}
+										{% trans "(Unknown)" %}
+									{% endif %}
+								</p></div>
+	                        </div>
+	                        <div class="form-group">
+	                            <label class="col-lg-2 control-label">{% trans "Registered:" %}</label> 
+	                            <div class="col-lg-10"><p class="form-control-static">{{ profile.date_joined|date:"Y-m-d" }}</p></div>
+	                        </div>
+                        </div>
+					</div>
+		  </div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

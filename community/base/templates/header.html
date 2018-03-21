@@ -1,0 +1,19 @@
+{% load i18n %}
+{% load base_tags %}
+
+{% site_setting 'NOTICE' as site_setting_NOTICE %}
+
+{% if user.is_superuser and reports %}
+	<div class="alert alert-dismissible alert-warning">
+		<button type="button" class="close" data-dismiss="alert">&times;</button>		  
+		<strong><a href="{% url 'admin:index' %}">{% trans "There are new reports" %} ({{ new_reports }})</a></strong>	  
+	</div>
+{% endif %}
+
+{% if site_setting_NOTICE %}
+	<div class="alert alert-dismissible alert-info">
+		<button type="button" class="close" data-dismiss="alert">&times;</button>		 
+		<h4>{% trans "Notice" %}</h4>
+		<p>{{ site_setting_NOTICE }}</p>
+	</div>
+{% endif %}

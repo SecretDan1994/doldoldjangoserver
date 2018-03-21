@@ -1,0 +1,17 @@
+{% load forum_extras %}
+{% load i18n %}
+
+{% if user.is_superuser and reports %}
+	<div class="alert alert-dismissible alert-warning">
+		<button type="button" class="close" data-dismiss="alert">&times;</button>		  
+		<strong><a href="{% url 'admin:index' %}">{% trans "There are new reports" %} ({% new_reports %})</a></strong>	  
+	</div>
+{% endif %}
+
+{% if forum_settings.NOTICE %}
+	<div class="alert alert-dismissible alert-info">
+		<button type="button" class="close" data-dismiss="alert">&times;</button>		 
+		<h4>{% trans "Notice" %}</h4>
+		<p>{{ forum_settings.NOTICE }}</p>
+	</div>
+{% endif %}

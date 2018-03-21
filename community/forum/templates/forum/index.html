@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load base_tags %}
+
+{% block title %}Forum Index{% endblock %}
+
+{% block beforebody %}
+    <style type="text/css">
+        .item-tag > span::before { 
+            content: "[";
+        }
+        .item-tag > span::after { 
+            content: "]";
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+	<div class="col-sm-12">
+		<div class="btn-group btn-breadcrumb">
+	        <a href="{{ request.get_full_path }}" class="active"><i class="fa fa-home" aria-hidden="true"></i> {% trans "Forums" %}</a>
+	    </div>
+    </div>
+</div>
+
+{% for cat in forum_struct %}
+<div class="row">
+	<div class="col-sm-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<a href="{{ cat.get_absolute_url }}">{{ cat.title }}</a>
+			</div>
+			<div class="panel-body">
+				{% for forum in cat.get_children %}
+					<div class="row">
+						<div class="col-sm-8">
+							<div style="float: left; width: 50px;height: 50px;position:relative">
+					            {% if forum.icon %}
+									<img src="{{ forum.icon.url }}" style="max-width: 50px;max-height:50px;right: 25%;position: absolute;top: 7%;transform: translate(25%, -7%);" />
+					            {% else %}
+									<span class="nosize"><!-- --></span>
+					            {% endif %}
+					        </div>
+					        <div style="float: left;border-right: 1px solid rgba(255,255,255, .1);height: 46px;width: 7px;margin-top:2px"></div>
+							<div style="display: block; margin-left: 62px;min-height: 50px;">
+									<strong><a href="{{ forum.get_absolute_url }}">{{ forum.title }}</a></strong>
+									<p><small>{{ forum.description|safe }}
+									</small></p>
+							</div>
+						</div>
+						<div class="col-sm-4 hidden-xs">
+							<div style="float: left; width: 55px;height: 50px;position:relative">
+								<span data-toggle="tooltip" data-placement="top" title="{% trans "Topics" %}"><i class="fa fa-reply-all" aria-hidden="true"></i>&nbsp;{{ forum.topic_count }}</span>
+								<br>
+								<span data-toggle="tooltip" data-placement="top" title="{% trans "Posts" %}"><i class="fa fa-comments-o" aria-hidden="true"></i>&nbsp;{{ forum.post_count }}</span>
+							</div>
+							{% if forum.updated %}
+								{% if forum.last_post.topic %}
+									<div style="display: block; margin-left: 62px;min-height: 50px;">
+										<i class="fa fa-comment-o" aria-hidden="true"></i>&nbsp;<a data-toggle="tooltip" data-placement="top" title="{% trans "Latest Post in" %}" href="{{ forum.lastest_topic.get_absolute_url }}">{{ forum.lastest_topic.title }}</a><small>&nbsp;{% trans "by" %}&nbsp;{{ forum.lastest_topic.author|preferred_name}}</small>
+										<p><small>{{forum.last_post.created}}</small></p>
+									</div>
+								{% endif %}
+							{% endif %}
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+</div>
+{% endfor %}
+
+<div class="row">
+	<div class="col-sm-6">
+		<div class="well">
+		  	<dl style="margin-bottom: 0px;">
+				<dt><strong>{% trans "Board statistics" %}</strong></dt>
+				<dd>{% trans "Total number of categories:" %} <strong>{{ forum_stats.cat_count }}</strong></dd>
+				<dd>{% trans "Total number of forums:" %} <strong>{{ forum_stats.forum_count }}</strong></dd>
+				<dd>{% trans "Total number of topics:" %} <strong>{{ forum_stats.topic_count }}</strong></dd>
+				<dd>{% trans "Total number of posts:" %} <strong>{{ forum_stats.post_count }}</strong></dd>
+			</dl>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		<div class="well">
+			<dl style="margin-bottom: 0px;">
+				<dt><strong>{% trans "User Information" %}</strong></dt>
+				{% if user.is_authenticated %}
+	            	<dd>{% trans "Logged in as" %} <strong>{{ user.username }}</strong></dd>
+	            	<dd>{% trans "Last visit:" %} <strong>{{ user.last_login }}</strong> < put in usertime!! </dd>
+	            {% else %}
+					<dt><strong>{% trans "You are not logged in." %}</strong></dt>
+				{% endif %}
+				<dd>{% trans "Total number of registered users:" %} <strong>{{ forum_stats.active_user_count }}</strong></dd>
+				<dd>{% trans "Total number of online users:" %} <strong>{{ forum_stats.active_session_count }}</strong></dd>
+			</dl>
+		</div>
+	</div>
+</div>
+
+{% if online_count %}
+<div class="row">
+	<div class="col-sm-12">
+		<div class="well well-lg">
+            <dt><strong>{% trans "Online:" %} </strong></dt>
+                    {% for online in users_online %}
+                        <dd>online|profile_link</dd>
+                    {% endfor %}
+        </div>
+	</div>
+</div>
+{% endif %}
+
+
+{% endblock %}

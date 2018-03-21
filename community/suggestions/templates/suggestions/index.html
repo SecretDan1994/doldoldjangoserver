@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load cache %}
+{% load i18n %}
+{% load base_tags %}
+
+
+{% block content %}
+
+{% site_setting "SUGGESTIONS_ARCHIVED_VALUE" as status_archived %}
+
+<style type="text/css">
+	.item-tag > span::before { 
+		content: "[";
+	}
+	.item-tag > span::after { 
+		content: "]";
+	}
+</style>
+
+<div class="row">
+	<div class="col-sm-12">
+		<div class="btn-group btn-breadcrumb">
+	        <a href="{% url 'suggestions:index' %}" class="active"><i class="fa fa-home" aria-hidden="true"></i> {% trans "Suggestions" %}</a>
+	    </div>
+    </div>
+</div>
+
+<div class="row">
+	<div class="col-sm-12">
+	  <div class="panel-group">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+    			<div class="row">
+					<div class="col-sm-12">
+						<div class="pull-right" style="padding-top: 8px;">
+							<div class="btn-toolbar nomargin" role="toolbar">
+								<div class="btn-group">
+							        {% include 'util/paginator.html' with page=suggestions_page request=request only %}
+							    </div>
+							    <div class="btn-group pull-right">
+                                    <div class="btn-toolbar nomargin" role="toolbar">
+                                        <div class="btn-group pull-right">
+                                            <a href="{% url 'suggestions:add_suggestion' %}" class="btn btn-default">{% trans "New Suggestion" %}</a>
+                                            <div class="btn-group">
+                                                <a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fa fa-caret-down" aria-hidden="true"></i>
+                                                </a>
+                                                <ul class="dropdown-menu dropdown-menu-right">
+                                                	<li><a href="{% url 'suggestions:index' %}">Overview</a></li>
+                                                    <li><a href="{% url 'suggestions:filtered_overview' %}?{% for cat in status_archived %}s={{ cat }}&amp;{% endfor %}">Archives</a></li>
+                                                    <li><a href="#">Filter</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+									{% if moderator %}
+									<div class="btn-group">
+								    	<a href="#" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+								        	<i class="fa fa-caret-down" aria-hidden="true"></i>
+								    	</a>
+								    	<ul class="dropdown-menu dropdown-menu-right">
+								      		<li class="dropdown-header">{% trans "Moderator control" %}</li>
+								      		<li class="divider"></li>
+								        	<li><a href="">{% trans "Delete multiple" %}</a></li>
+								    	</ul>
+								    </div>
+								    {% endif %}	
+							    </div>
+							</div>
+						</div>
+						<h3>
+							<strong>{% trans "Suggestions Overview" %}</strong>
+							<p><small>A list of all suggestions for this community (needs more info!)</small></p>
+						</h3>
+					</div>
+				</div>
+    		</div>
+    	</div>
+	    </div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-lg-7">
+	  <div class="panel-group">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Suggestions
+			</div>
+			<div class="panel-body" >
+				{% for item in suggestions_page %}
+					<div class="row" id="suggestion_{{ item.id }}">
+						<div class="col-sm-12">
+							<div style="float: left; width: 50px;height: 50px;position:relative">
+								<h2 style="margin-top: 8px;text-align: right;margin-left: -10px;">{{ item.rating|default_if_none:'0' }}</h2>
+					        </div>
+					        <div style="float: left;border-right: 1px solid rgba(255,255,255, .1);height: 46px;width: 7px;margin-top:2px"></div>
+							<div style="display: block; margin-left: 62px;min-height: 50px;">
+									<strong><a href="{{ item.get_absolute_url }}">{{ item.title }}</a></strong>
+									<p><strong class="item-tag">{{ item.status.value_html|safe }}</strong>
+										{% with item.categories.all as categories %}
+											{% if categories %}
+												<em>{% trans "Categories:" %}</em> 
+													{% for ct in categories %}
+														{% if forloop.last %}
+															{{ ct }}.
+														{% else %}
+															{{ ct }},
+														{% endif %}
+													{% endfor %}
+											{% endif %}
+										{% endwith %}
+									</p>
+							</div>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+			<div class="panel-footer"">
+				<div class="row">
+					<div class="col-sm-12">
+						{% if user.is_authenticated %}
+							<div class="pull-right">
+								<a href="{% url 'suggestions:add_suggestion'%}" class="btn btn-default">{% trans "New Suggestion" %}</a>
+							</div>
+						{% endif %}
+						<div class="pull-left">{% include 'util/paginator.html' with page=suggestions_page request=request only %}</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	    </div>
+	</div>
+
+	<div class="col-lg-5">
+		<div class="well">
+			<p>Need help? Need an unban? Have a complaint? This is not the place to be!<br>See <a href="#">here</a> for more info.</p>
+
+			<p>Here you can submit suggestions to improve anything to do with TU, the website, the community or anything it owns.</p>
+			<p>You may also vote on which suggestions to implement, the more votes, the more likely and faster it will be implemented.</p>
+			<p>Auggestions with a negative rating will likely not be implemented at all.</p>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

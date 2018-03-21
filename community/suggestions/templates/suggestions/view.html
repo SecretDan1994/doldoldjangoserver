@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{% load cache %}
+{% load i18n %}
+{% load base_tags %}
+
+{% csrf_token %}
+
+{% block content %}
+
+<div class="row">
+	<div class="col-sm-12">
+		<div class="btn-group btn-breadcrumb">
+	        <a href="{% url 'suggestions:index' %}"><i class="fa fa-home" aria-hidden="true"></i> {% trans "Suggestions" %}</a>
+	        <a href="{{ request.get_full_path }}" class="active"><i class="fa fa-home" aria-hidden="true"></i> {{suggestion.title}}</a>
+	    </div>
+    </div>
+</div>
+
+<style type="text/css">
+	.tab-panel .nav-tabs > li > a {
+		border-radius: 4px 4px 0 0 ;
+	}
+
+	.tab-panel .tab-content .tab-pane > div {
+		border-top-right-radius: 0px;
+		border-top-left-radius: 0px;
+		border-top: 0px;
+	}
+
+	.stacked-margin-form > .form-group {
+		margin-top: 0px;
+		margin-bottom: 0px;
+	}
+</style>
+
+<div class="row">
+	<div class="col-sm-12">
+	  <div class="panel-group">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+    			<div class="row">
+					<div class="col-sm-12">
+						<div class="pull-right" style="padding-top: 8px;">
+							<div class="btn-toolbar nomargin" role="toolbar">
+							    <div class="btn-group pull-right">
+							        <a href="#" class="btn btn-default">{% trans "New Suggestion" %}</a>
+									{% if moderator %}
+									<div class="btn-group">
+								    	<a href="#" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+								        	<i class="fa fa-caret-down" aria-hidden="true"></i>
+								    	</a>
+								    	<ul class="dropdown-menu dropdown-menu-right">
+								      		<li class="dropdown-header">{% trans "Moderator control" %}</li>
+								      		<li class="divider"></li>
+								        	<li><a href="">{% trans "Dev Update" %}</a></li>
+								      		<li class="divider"></li>
+								        	<li><a href="">{% trans "Delete" %}</a></li>
+								        	<li><a href="">{% trans "Edit" %}</a></li>
+								    	</ul>
+								    </div>
+								    {% endif %}	
+							    </div>
+							</div>
+						</div>
+						<h3>
+							<strong>{% trans "Suggestion" %}: {{ suggestion.title }}</strong>
+						</h3>
+					</div>
+				</div>
+    		</div>
+    	</div>
+	    </div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-lg-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				{% trans "Description" %}:
+			</div>
+			<div class="panel-body">
+				{{suggestion.message_html|safe}}
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-lg-8">
+		<div class="panel-group">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					{% trans "Comments" %}:
+				</div>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<div class="col-lg-4">
+						poster 1
+					</div>
+					<div class="col-lg-8">
+						comment 1
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-lg-4">
+			<div class="well well-sm">
+					<div class="btn-group btn-group-justified">
+			  			<a id="suggention_{{suggestion.id}}_vote_down" data-suggestion="{{suggestion.id}}" data-vote="-1" class="btn js-click-vote {% if vote_down_active %}btn-primary{% else %}btn-danger{% endif %}">Down</a>
+			  			<a id="suggention_{{suggestion.id}}" style="font-weight: bold;" class="btn btn-default">{{suggestion.get_rating|default_if_none:'0'}}</a>
+			  			<a id="suggention_{{suggestion.id}}_vote_up" data-suggestion="{{suggestion.id}}" data-vote="+1" class="btn js-click-vote {% if vote_up_active %}btn-primary{% else %}btn-success{% endif %}">Up</a>
+			  		</div>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					{% trans "Info" %}:
+				</div>
+				<div class="panel-body">
+					<div class="form-horizontal stacked-margin-form">
+				        <div class="form-group">
+	                        <label class="col-lg-4 control-label">{% trans "Submitter:" %}</label> 
+	                        <div class="col-lg-8"><p class="form-control-static">{{suggestion.from_user|preferred_name}}</p></div>
+	                    </div>
+				        <div class="form-group">
+	                        <label class="col-lg-4 control-label">{% trans "Created on:" %}</label> 
+	                        <div class="col-lg-8"><p class="form-control-static">{{suggestion.time|date:'Y-m-d H:i'}}</p></div>
+	                    </div>
+				        <div class="form-group">
+	                        <label class="col-lg-4 control-label">{% trans "Current Status:" %}</label> 
+	                        <div class="col-lg-8"><p class="form-control-static">{{suggestion.status.value_html|safe}}</p></div>
+	                    </div>
+				        <div class="form-group">
+	                        <label class="col-lg-4 control-label">{% trans "Categories:" %}</label> 
+	                        <div class="col-lg-8"><p class="form-control-static">{% with suggestion.categories.all as categories %}{% if categories %}{% for ct in categories %}{% if forloop.last %}{{ ct }}.{% else %}{{ ct }},{% endif %}{% endfor %}{% endif %}{% endwith %}</p></div>
+	                    </div>
+				</div>
+			</div>
+			</div>
+	</div>
+</div>
+{% endblock %}
+
+
+{% block afterscript %}
+<script type="text/javascript">
+	// using jQuery
+	function getCookie(name) {
+	    var cookieValue = null;
+	    if (document.cookie && document.cookie !== '') {
+	        var cookies = document.cookie.split(';');
+	        for (var i = 0; i < cookies.length; i++) {
+	            var cookie = jQuery.trim(cookies[i]);
+	            // Does this cookie string begin with the name we want?
+	            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+	                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+	                break;
+	            }
+	        }
+	    }
+	    return cookieValue;
+	}
+	var csrftoken = getCookie('csrftoken');
+
+	function csrfSafeMethod(method) {
+	    // these HTTP methods do not require CSRF protection
+	    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+	}
+	$.ajaxSetup({
+	    beforeSend: function(xhr, settings) {
+	        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+	            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+	        }
+	    }
+	});
+
+	// Submit post on submit
+	$('.js-click-vote').click(function() {
+		vote = $(this).data('vote');
+		suggestion = $(this).data('suggestion');
+		if (vote == +1) {
+			create_post(suggestion, +1);
+			$(this).toggleClass("btn-success");
+			$("#suggention_"+suggestion+"_vote_down").removeClass("btn-primary");
+			$("#suggention_"+suggestion+"_vote_down").addClass("btn-danger");
+			$(this).toggleClass("btn-primary");
+		} else if (vote == -1) {
+			create_post(suggestion, -1);
+			$(this).toggleClass("btn-danger");
+			$("#suggention_"+suggestion+"_vote_up").removeClass("btn-primary");
+			$("#suggention_"+suggestion+"_vote_up").addClass("btn-success");
+			$(this).toggleClass("btn-primary");
+		}
+	});
+
+	// AJAX for posting
+	function create_post(for_suggestion, vote_data) {
+	    $.ajax({
+	        url : "{% url 'suggestions:post_vote' %}", // the endpoint
+	        type : "POST", // http method
+	        data : { for_suggestion : for_suggestion, vote_data : vote_data}, // data sent with the post request
+
+	        // handle a successful response
+	        success : function(json) {
+				vote = json.vote_data;
+				suggestion = json.for_suggestion;
+
+	            $('#suggention_'+suggestion).html(function(i, val) { return +val+vote });
+
+				if (vote > 0) {
+					$(this).toggleClass("btn-success");
+					$("#suggention_"+suggestion+"_vote_down").removeClass("btn-primary");
+					$("#suggention_"+suggestion+"_vote_down").addClass("btn-danger");
+					$(this).toggleClass("btn-primary");
+				} else if (vote < 0) {
+					$(this).toggleClass("btn-danger");
+					$("#suggention_"+suggestion+"_vote_up").removeClass("btn-primary");
+					$("#suggention_"+suggestion+"_vote_up").addClass("btn-success");
+					$(this).toggleClass("btn-primary");
+				}
+	        },
+
+	        // handle a non-successful response
+	        error : function(xhr,errmsg,err) {
+	            $("#django-msg-wrapper").append('<div class="alert alert-danger alert-dismissible"> \
+													<button type="button" class="close" data-dismiss="alert">&times;</button> \
+													<h4>{% trans "Error" %}</h4> \
+													<p>Error: '+errmsg+xhr.responseText+'<br></p>\
+												</div>'); // add the error to the dom
+	            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+	        }
+	    });
+	};
+							
+</script>
+{% endblock afterscript %}

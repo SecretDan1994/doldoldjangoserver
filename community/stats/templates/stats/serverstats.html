@@ -1,0 +1,825 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Server List{% endblock %}
+
+{% block beforebody %}
+    <style type="text/css">
+
+    /*
+    *, html {
+        margin:0;
+        padding:0;  
+    }
+
+    h1, p, span, th, strong, #round{
+        white-space: nowrap;
+    }
+
+    table{
+        width: 100%;
+        table-layout: fixed;
+    }
+    */
+
+    .no-gutter {
+        padding:0px;
+        margin:0px;
+    }
+
+    .item-tag > span::before { 
+        content: "[";
+    }
+    .item-tag > span::after { 
+        content: "]";
+    }
+
+    .table-terrorist>tbody>tr:nth-child(odd)>td,tr{
+        background-color:rgba(0,0,0,0.25);
+    }
+    .table-cterrorist>tbody>tr:nth-child(odd)>td,tr{
+        background-color:rgba(0,0,0,0.25);
+    }
+
+    .table-terrorist{
+        background-color:rgba(255,51,51,0.40);
+        margin-bottom: 0px;
+    }
+    .table-cterrorist{
+        background-color:rgba(51,51,255,0.40);
+        margin-bottom: 0px;
+    }
+    .table-header{
+        background-color:rgba(255,255,255,0.04);
+    }
+
+    .ct-wins{
+        color: rgb(41,144,216);
+    }
+
+    .t-wins{
+        color: rgb(216,144,41);
+    }
+
+    #player_{{steamid}}{
+        margin: 5px 0;
+    }
+
+    .special{
+        margin: 5px 0 !important;
+    }
+
+    .table-spec>tbody>tr>td:hover{
+        background-color: #49515a;
+    }
+    .table-spec>tbody>tr>td:nth-chil(odd){
+        background-color:rgba(0,0,0,0.25);
+    }
+    .table-spec>tbody>tr>td>.player-name:after {
+        content: ", ";
+    }
+    .table-spec>tbody>tr>td>.player-name:last-child:after{
+        content: "";
+    }
+    .table-spec>tbody>tr>th{
+        white-space: nowrap;
+    }
+    .table-spec{
+        background-color:rgba(255,255,255,0.40);
+        margin-bottom: 0px;
+    }
+    .logarea{
+        overflow-y: scroll;
+        background-color:#3e444c;
+        height:250px;
+        color:#eee;
+        display: block;
+        width: 100%;
+        padding: 8px 12px;
+        margin-bottom: 15px;
+        font-size: 14px;
+        line-height: 1.42857143;
+        background-image: none;
+        border: 1px solid #000000;
+        border-radius: 4px;
+        -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+        box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+        -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+        -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    }
+    .dropdown-item{
+        margin-left: 7%;
+    }
+
+    /*-----------------MEDIA QUERIES-------------------------*/
+    @media only screen and (max-width: 437px) {
+
+        #page-content-wrapper{
+            display: table;
+        }
+
+    }
+
+    </style>
+{% endblock %}
+
+{% block content %}
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="btn-group btn-breadcrumb">
+                    <a href="{% url 'server-list' %}"><i class="fa fa-server" aria-hidden="true"></i> {% trans "Game Servers" %}</a>
+                    <a href="#">{{scoreboard.hostname}}</a>
+                    <a href="{{ request.get_full_path }}" class="active">Stats</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+              <div class="panel-group">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class='pull-right'>
+                                    <h4>{% if gameserver.connected %}<span class="label label-success">Active</span>{% else %}<span class="label label-danger">Inactive</span>{% endif %}</h4>
+                                </div>
+                                <h3>
+                                    <strong>Stats</strong>
+                                    <p><small>Live scoreboard and logs for {{scoreboard.hostname}}.</small></p>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel-group">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Scoreboard
+                        </div>
+                        <div class="panel-body" style="padding:0px"> 
+                            <div class="col-lg-6 no-gutter">
+
+                                <div class="pull-left"  style="padding: 4px;padding-left: 8px">
+                                    <h1 class="ct-wins" id="ct-name" style="font-size: 22px; margin: 0"><strong>{{scoreboard.teams.3.name}}</strong></h1>
+                                    <h1 class="ct-wins" id="ct-players-alive" style="font-size: 14px; margin: 0;"><strong>Players Alive:<em>&nbsp;{{scoreboard.teams.3.alive_count}}/{{scoreboard.teams.3.player_count}}</em></strong></h1>
+                                </div>
+
+                                <div class="pull-right" style="padding: 4px;">                                                            
+                                    <h1 style="margin: 0;"><span id="ct-round-wins" class="ct-wins">{{scoreboard.teams.3.score}}</span><span style="margin-right: -0.25em;" class="hidden-md hidden-sm hidden-xs">&nbsp;:</span></h1>
+                                </div>
+
+                                <table class="table table-cterrorist table-hover" style="margin:0;border: black solid 0px;">
+                                    <thead>
+                                      <tr>
+                                        <th style="width: 1px"></th>
+                                        <th>Tag</th>
+                                        <th>Player Name</th>
+                                        <th></th>
+                                        <th>K</th>
+                                        <th>D</th>
+                                        <th>R</th>
+                                        <th>MVP</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody class="ct-players">
+                                        {% for steamid, data in scoreboard.players.items %}
+                                            {% if data.team == 3 %}
+                                            <tr id="player_{{steamid}}" class="ct-player" style="width: 100%;">                                           
+                                                {% if data.alive == False %}
+                                                    <td></td>
+                                                    {% if data.tag %}
+                                                        <td><span style="color: #7a8288">{{data.tag}}</span></td>
+                                                    {% else %}
+                                                        <td></td>
+                                                    {% endif %}
+                                                    <td><span style="color: #7a8288">{{data.name}}</span></td>
+                                                    <td>&#x1f480;</td>
+                                                    <td><span style="color: #7a8288">{{data.kills}}</span></td>
+                                                    <td><span style="color: #7a8288">{{data.deaths}}</span></td>
+                                                    <td><span style="color: #7a8288">{{data.kd}}</span></td>
+                                                {% else %}
+                                                    <td></td>
+                                                    {% if data.tag %}
+                                                        <td><span style="color: rgb(41,144,216)">{{data.tag}}</span></td>
+                                                    {% else %}
+                                                        <td></td>
+                                                    {% endif %}
+                                                    <td><span style="color: rgb(41,144,216)">{{data.name}}</span></td>
+                                                    <td></td>
+                                                    <td><span style="color: rgb(41,144,216)">{{data.kills}}</span></td>
+                                                    <td><span style="color: rgb(41,144,216)">{{data.deaths}}</span></td>
+                                                    <td><span style="color: rgb(41,144,216)">{{data.kd}}</span></td>
+                                                {% endif %}
+                                                {% if data.mvp > 0 %}
+                                                    <td>&#x2b50;<sup style="color: rgb(240,180,18)">{{data.mvp}}</sup></td>
+                                                {% else %}
+                                                    <td></td>
+                                                {% endif %}
+                                            </tr>
+                                                {% endif %}
+                                        {% endfor %}
+                                    </tbody>    
+                                </table>
+                            </div>
+                            <div class="col-lg-6 no-gutter">
+
+                                <div class="pull-right hidden-md hidden-sm hidden-xs" style="padding: 4px;padding-right: 8px">
+                                    <h1 class="t-wins" id="t-name" style="font-size: 22px; margin: 0"><strong>{{scoreboard.teams.2.name}}</strong></h1>
+                                    <h1 class="t-wins" id="t-players-alive" style="font-size: 14px; margin: 0;"><strong>Players Alive:<em>&nbsp;{{scoreboard.teams.2.alive_count}}/{{scoreboard.teams.2.player_count}}</em></strong></h1>
+                                </div>
+
+                                <div class="pull-left hidden-md hidden-sm hidden-xs" style="padding: 4px;">                                                            
+                                    <h1 style="margin: 0;"><span style="margin-left: -0.25em;" class=>:&nbsp;</span><span id="t-round-wins" class="t-wins">{{scoreboard.teams.2.score}}</span></h1>
+                                </div>
+
+                                <div class="pull-left hidden-lg" style="padding: 4px;padding-left: 8px">
+                                    <h1 class="t-wins" id="t-name" style="font-size: 22px; margin: 0"><strong>{{scoreboard.teams.2.name}}</strong></h1>
+                                    <h1 class="t-wins" id="t-players-alive" style="font-size: 14px; margin: 0;"><strong>Players Alive:<em>&nbsp;{{scoreboard.teams.2.alive_count}}/{{scoreboard.teams.2.player_count}}</em></strong></h1>
+                                </div>
+
+                                <div class="pull-right hidden-lg" style="padding: 4px;">                                                            
+                                    <h1 style="margin: 0;"><span id="t-round-wins" class="t-wins">{{scoreboard.teams.2.score}}</span></h1>
+                                </div>
+
+                                <table class="table table-terrorist table-hover" style="border: black solid 0px;">
+                                    <thead>
+                                      <tr>
+                                        <th style="width: 1px"></th>
+                                        <th>Tag</th>
+                                        <th>Player Name</th>
+                                        <th></th>
+                                        <th>K</th>
+                                        <th>D</th>
+                                        <th>R</th>
+                                        <th>MVP</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody class="t-players">
+                                        {% for steamid, data in scoreboard.players.items %}
+                                            {% if data.team == 2 %}
+                                            <tr id="player_{{steamid}}" class="t-player" style="width: 100%;">
+                                                {% if data.alive == False %}
+                                                    <td></td>
+                                                    {% if data.tag %}
+                                                        <td><span style="color: #7a8288">{{data.tag}}</span></td>
+                                                    {% else %}
+                                                        <td></td>
+                                                    {% endif %}
+                                                    <td><span style="color: #7a8288">{{data.name}}</span></td>
+                                                    <td>&#x1f480;</td>
+                                                    <td><span style="color: #7a8288">{{data.kills}}</span></td>
+                                                    <td><span style="color: #7a8288">{{data.deaths}}</span></td>
+                                                    <td><span style="color: #7a8288">{{data.kd}}</span></td>
+                                                {% else %}
+                                                    <td></td>
+                                                    {% if data.tag %}
+                                                        <td><span style="color: rgb(216,144,41)">{{data.tag}}</span></td>
+                                                    {% else %}
+                                                        <td></td>
+                                                    {% endif %}
+                                                    <td><span style="color: rgb(216,144,41)">{{data.name}}</span></td>
+                                                    <td></td>
+                                                    <td><span style="color: rgb(216,144,41)">{{data.kills}}</span></td>
+                                                    <td><span style="color: rgb(216,144,41)">{{data.deaths}}</span></td>
+                                                    <td><span style="color: rgb(216,144,41)">{{data.kd}}</span></td>
+                                                {% endif %}
+                                                {% if data.mvp > 0 %}
+                                                    <td>&#x2b50;<sup style="color: rgb(240,180,18)">{{data.mvp}}</sup></td>
+                                                {% else %}
+                                                    <td></td>
+                                                {% endif %}
+                                            </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-lg-12 no-gutter">
+                                 <table class="table table-spec" style="border: black solid 0;">
+                                    <tbody>
+                                      <tr>
+                                        <td style="width: 1px;"></td>
+                                        <th id="spectators" style="width: 130px">Spectators ({{scoreboard.teams.1.player_count|add:scoreboard.teams.0.player_count}}):</th>
+                                        <td class= "specnames" style="width: 100%;">
+                                        {% for steamid, data in scoreboard.players.items %}
+                                            {% if data.team in specteams %}
+                                                <span id="player_{{steamid}}" class="player-name">{{data.name}}</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="pull-left">
+                                        <span id="server" class="server-name">Server: {{scoreboard.hostname}}</span>
+                                        <p style="margin-bottom: 0"><strong class="item">Map: <span id="map" class="current-map"><em>{{scoreboard.map}}</em></span></strong></p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="pull-right">
+                                        <span id="round" class="current-round">Round: {{scoreboard.round_count}}</span>
+                                        <p style="margin-bottom: 0"><strong class="item">Players: <span id="player" class="player-count"><em>{{scoreboard.player_count}}/{{scoreboard.slots}}</em></span></strong></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel-group">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Server Logs
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-control logarea">
+                                {% for log_entry in scoreboard.logs %}<div>{{log_entry}}</div>{% endfor %}
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="pull-left"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+<!-- /#wrapper -->
+
+{% block afterscript %}
+    <script type="text/javascript" src="{% static 'channels/js/websocketbridge.js' %}"></script>
+
+    <script type="text/javascript">
+
+    /*
+        const webSocketBridge = new channels.WebSocketBridge();
+        webSocketBridge.connect('/ws/');
+        webSocketBridge.socket.addEventListener('open', function(action, stream) {
+            console.log("Connected to WebSocket");
+            console.log(action, stream);
+        })*/
+
+    $( document ).ready(function() {
+        $('.logarea').scrollTop($(".logarea")[0].scrollHeight);
+    });
+
+
+    //Initialize client-side scoreboard with recent django template data.
+    var scoreboard = {};
+    scoreboard["ct_player_count"] = {{scoreboard.teams.3.player_count}};
+    scoreboard["ct_alive_count"] = {{scoreboard.teams.3.alive_count}};
+    scoreboard["t_player_count"] = {{scoreboard.teams.2.player_count}};
+    scoreboard["t_alive_count"] = {{scoreboard.teams.2.alive_count}};
+    scoreboard["spec_count"] = {{scoreboard.teams.1.player_count|add:scoreboard.teams.0.player_count}};
+    scoreboard["ct_score"] = {{scoreboard.teams.3.score}};
+    scoreboard["t_score"] = {{scoreboard.teams.2.score}};
+    scoreboard["current_round"] = {{scoreboard.round_count}};
+    scoreboard["players"] = {};
+    {% for steamid, data in scoreboard.players.items %}
+        scoreboard.players["{{steamid}}"] = { 
+        {% if data.alive %}"alive":true{% else %}"alive":false{% endif %}, 
+        {% if data.tag %}"tag":"{{ data.tag }}"{% else %}"tag":""{% endif %},
+        "deaths":{{data.deaths}}, 
+        "kills":{{data.kills}}, 
+        "ip":"{{data.ip}}", 
+        "team":{{data.team}}, 
+        "name":"{{data.name}}", 
+        "mvp":{{data.mvp}} 
+    };
+    {% endfor %}
+    sortPlayersbyKills();
+    console.log(scoreboard.players);
+
+    scoreboard["player_count"] = {{scoreboard.player_count}};
+    scoreboard["map"] = "{{scoreboard.map}}";
+    scoreboard["hostname"] = "{{scoreboard.hostname}}";
+    scoreboard["team_three_name"] = "{{scoreboard.teams.3.name}}";
+    scoreboard["team_two_name"] = "{{scoreboard.teams.2.name}}";
+    scoreboard["slots"] = {{scoreboard.slots}};
+
+    function sortPlayersbyKills(){
+        var items = Object.keys(scoreboard["players"]).map(function(key) {
+            return [scoreboard["players"][key], scoreboard["players"][key]["kills"]];
+        });
+
+        var steamidarray = Object.keys(scoreboard["players"]).map(function(key) {
+            return [key, scoreboard["players"][key]["kills"]];
+        });
+
+        items.sort(function(first, second){
+            return second[1] - first[1];
+        })
+
+        steamidarray.sort(function(first, second){
+            return second[1] - first[1];
+        })
+
+        scoreboard["players"] = {};
+        var steamid, item, length = items.length;
+        for (var count = 0; count<length; count++){
+            steamid = steamidarray[count][0];
+            item = items[count][0];
+            scoreboard.players[steamid] = item;
+        }
+    }
+
+    function updateCounts(){
+        if(scoreboard["player_count"] > 0){
+            scoreboard["ct_player_count"] = 0;
+            scoreboard["ct_alive_count"] = 0;
+            scoreboard["t_player_count"] = 0;
+            scoreboard["t_alive_count"] = 0;
+            scoreboard["spec_count"] = 0;
+            //Figure out amount of ct players and living ct players.
+            for (const key of Object.keys(scoreboard["players"])){
+                if(scoreboard["players"][key]["team"] == 3 &&  scoreboard["players"][key]["alive"]){
+                    scoreboard["ct_player_count"] += 1;
+                    scoreboard["ct_alive_count"] += 1;
+                }
+                else if(scoreboard["players"][key]["team"] == 3 && !scoreboard["players"][key]["alive"]){
+                    scoreboard["ct_player_count"] += 1;
+                }         
+            //Figure out amount of t players and living t players.
+                else if(scoreboard["players"][key]["team"] == 2 && scoreboard["players"][key]["alive"]){
+                    scoreboard["t_player_count"] += 1;
+                    scoreboard["t_alive_count"] += 1;
+                }
+                else if(scoreboard["players"][key]["team"] == 2 && !scoreboard["players"][key]["alive"]){
+                    scoreboard["t_player_count"] += 1;
+                }  
+
+            //Figure out amount of spectators.
+                else if(scoreboard["players"][key]["team"] == 1 || scoreboard["players"][key]["team"] == 0){
+                    scoreboard["spec_count"] += 1;
+                }
+            }
+        }
+    }
+
+    function updateScoreboard(data, tag){
+        var time = data.payload.time;
+        var payloaddata = data.payload.data;
+        var dbid = data.payload.dbid;
+
+        if(tag == "snapshot"){
+            scoreboard["map"] = payloaddata.map;
+            scoreboard["hostname"] = payloaddata.hostname;
+            scoreboard["players"] = payloaddata.players;
+            scoreboard["ct_player_count"] = 0;
+            scoreboard["ct_alive_count"] = 0;
+            scoreboard["t_player_count"] = 0;
+            scoreboard["t_alive_count"] = 0;
+            scoreboard["spec_count"] = 0;
+            scoreboard["player_count"] = 0;
+            scoreboard["ct_score"] = payloaddata.teams["3"]["score"];
+            scoreboard["t_score"] = payloaddata.teams["2"]["score"];
+            scoreboard["team_three_name"] = payloaddata.teams["3"]["name"];
+            scoreboard["team_two_name"] = payloaddata.teams["2"]["name"];
+            scoreboard["current_round"] = parseInt(scoreboard["ct_score"]) + parseInt(scoreboard["t_score"]) + 1;
+            scoreboard["slots"] = payloaddata.slots;
+            scoreboard["player_count"] = Object.keys(scoreboard["players"]).length;
+            console.log(scoreboard["player_count"]);
+
+            updateCounts();
+            sortPlayersbyKills();
+        }
+        else if(tag == "player_death"){
+            // TESTING STUFF.
+            console.log("Payloaddata steam id is: " + payloaddata.steamid);
+            console.log("Dict of players: ");
+            for (const key of Object.keys(scoreboard["players"])){
+                console.log(key);
+                if(key == payloaddata.steamid){
+                    console.log("key from players dict is: " + key);
+                    scoreboard["players"][key]["alive"] = false;
+                    scoreboard["players"][key]["deaths"] += 1;
+                }
+                else if(key == payloaddata.attacker && key != payloaddata.steamid){
+                    scoreboard["players"][key]["kills"] += 1;
+                }
+            }
+            updateCounts();
+            sortPlayersbyKills();
+        }
+        else if(tag == "player_team"){
+            for (const key of Object.keys(scoreboard["players"])){
+                if(key == payloaddata.steamid){
+                    scoreboard["players"][key]["team"] = payloaddata.team;
+                    console.log("inside player_team: " + scoreboard["players"][key]["team"]);
+                }
+            }
+            updateCounts();
+            sortPlayersbyKills();
+        }
+        else if(tag == "round_end"){
+            if(payloaddata.winner == '3'){
+                scoreboard["ct_score"] += 1;
+            }
+            else if(payloaddata.winner == '2'){
+                scoreboard["t_score"] += 1;
+            }
+            scoreboard["current_round"] += 1;
+            updateCounts();
+            sortPlayersbyKills();
+        }
+        else if(tag == "player_spawn"){
+            for (const key of Object.keys(scoreboard["players"])){
+                if(key == payloaddata.steamid){
+                    scoreboard["players"][key]["alive"] = true;
+                }
+            }
+            updateCounts();
+            sortPlayersbyKills();
+        }
+        else if(tag == "player_connect"){
+            var doesNotExist = true;
+            var steamid = payloaddata.steamid;
+            scoreboard.players[steamid] = {"alive":false, "tag":false, "deaths":0, "kills":0, "ip":payloaddata.ip, "team":0, "name":payloaddata.name, "mvp":0};
+            scoreboard["player_count"] += 1;
+            updateCounts();
+            sortPlayersbyKills();
+            console.log(scoreboard.players);
+        }
+        else if(tag == "player_changename"){
+            for (const key of Object.keys(scoreboard["players"])){
+                if(key == payloaddata.steamid){
+                    scoreboard["players"][key]["name"] = payloaddata.newname;
+                }
+            }
+        }
+        else if(tag == "round_mvp"){
+            for (const key of Object.keys(scoreboard["players"])){
+                if(key == payloaddata.steamid){
+                    scoreboard["players"][key]["mvp"] += 1;
+                }
+            }
+        }
+        else if(tag == "player_disconnect"){
+            for (const key of Object.keys(scoreboard["players"])){
+                if(key == payloaddata.steamid){
+                    delete scoreboard["players"][key];
+                    scoreboard["player_count"] -= 1;
+                }
+            }
+            console.log(scoreboard.players);
+            updateCounts();
+            sortPlayersbyKills();
+        }
+        else if(tag == "game_newmap"){
+            scoreboard["map"] = payloaddata.mapname;
+            scoreboard["ct_score"] = 0;
+            scoreboard["t_score"] = 0;
+            scoreboard["current_round"] = 1;
+            for (const key of Object.keys(scoreboard["players"])){
+                scoreboard["players"][key]["kills"] = 0;
+                scoreboard["players"][key]["deaths"] = 0;
+                scoreboard["players"][key]["team"] = 0;
+                scoreboard["players"][key]["mvp"] = 0;
+            }
+            updateCounts();
+        }
+
+        //Update the Server, Current Map, Current Round, and Player-Count.
+        $('.server-name').empty();
+        $('.server-name').append("Server: " + scoreboard["hostname"]);
+        $('.current-map').empty();
+        $('.current-map').append("<em>" + scoreboard["map"] + "</em>");
+        $('.current-round').empty();
+        $('.current-round').append("Round: " + scoreboard["current_round"]);
+        $('.player-count').empty();
+        $('.player-count').append("<em>" + scoreboard["player_count"] + "/" + scoreboard["slots"] + "</em>");
+
+        //Update CT and T Players Alive.
+        $('#ct-players-alive').empty();
+        $('#ct-players-alive').append("<strong>Players Alive:<em>&nbsp;" + scoreboard["ct_alive_count"] + "/" + scoreboard["ct_player_count"] + "</em></strong>");
+        $('#t-players-alive').empty();
+        $('#t-players-alive').append("<strong>Players Alive:<em>&nbsp;" + scoreboard["t_alive_count"] + "/" + scoreboard["t_player_count"] + "</em></strong>");
+
+        //Update CT and T Score.
+        $('#ct-round-wins').empty();
+        $('#ct-round-wins').append(scoreboard["ct_score"]);
+        $('#t-round-wins').empty();
+        $('#t-round-wins').append(scoreboard["t_score"]);
+
+        //Display correct team names at all times.
+        $('#ct-name').empty();
+        $('#ct-name').append("<strong>" + scoreboard["team_three_name"] + "</strong>");
+        $('#t-name').empty();
+        $('#t-name').append("<strong>" + scoreboard["team_two_name"] + "</strong>");
+
+        //Update Spectator Count and Spectator Name List.
+        $('#spectators').empty();
+        $('#spectators').append("Spectators (" + scoreboard["spec_count"] + "):");
+
+        $('.specnames').empty();
+
+        for (const key of Object.keys(scoreboard["players"])){
+            if(scoreboard["players"][key]["team"] == '1' || scoreboard["players"][key]["team"] == '0'){
+                console.log("inside output: " + scoreboard["players"][key]["team"]);
+                $('.specnames').append("<span id='ctplayer_" + key + "' class='player-name'>" + scoreboard["players"][key]["name"] + "</span>");
+            }
+        }
+
+        //Update CT Player list.
+        $('.ct-players').empty();
+        $('.ct-player').empty();
+        var ctRow = 0;
+        for (const key of Object.keys(scoreboard["players"])){
+            if(scoreboard["players"][key]["team"] == '3'){
+            ctRow += 1;
+                $('.ct-players').append("<tr id='ctplayer_" + ctRow + "' class='ct-player' style='width: 100%;'></tr>");
+                if (!scoreboard["players"][key]["alive"]){
+                    $('#ctplayer_'+ctRow).append("<td></td>");
+                    if(scoreboard["players"][key]["tag"]){
+                        $('#ctplayer_'+ctRow).append("<td><span style='color: #7a8288'>" + scoreboard["players"][key]["tag"] + "</span></td>");
+                    }
+                    else{
+                        $('#ctplayer_'+ctRow).append("<td></td>");
+                    }
+                    $('#ctplayer_'+ctRow).append("<td><span style='color: #7a8288'>" + scoreboard["players"][key]["name"] + "</span></td>");
+                    $('#ctplayer_'+ctRow).append("<td>&#x1f480;</td>");
+                    $('#ctplayer_'+ctRow).append("<td><span style='color: #7a8288'>" + scoreboard["players"][key]["kills"] + "</span></td>");
+                    $('#ctplayer_'+ctRow).append("<td><span style='color: #7a8288'>" + scoreboard["players"][key]["deaths"] + "</span></td>");
+
+                    var kd = 0;
+                    var kills = scoreboard["players"][key]["kills"];
+                    var deaths = scoreboard["players"][key]["deaths"];
+                    if(scoreboard["players"][key]["deaths"] != 0)
+                        kd = parseInt(kills)/parseInt(deaths);
+                    else
+                        kd = parseInt(kills);
+                    kd = kd.toFixed(2);
+
+                    $('#ctplayer_'+ctRow).append("<td><span style='color: #7a8288'>" + kd + "</span></td>");
+                }
+                else{
+                    $('#ctplayer_'+ctRow).append("<td></td>");
+                    if(scoreboard["players"][key]["tag"]){
+                        $('#ctplayer_'+ctRow).append("<td><span style='color: rgb(41,144,216)'>" + scoreboard["players"][key]["tag"] + "</span></td>");
+                    }
+                    else{
+                        $('#ctplayer_'+ctRow).append("<td></td>");
+                    }
+                    $('#ctplayer_'+ctRow).append("<td><span style='color: rgb(41,144,216)'>" + scoreboard["players"][key]["name"] + "</span></td>");
+                    $('#ctplayer_'+ctRow).append("<td></td>");
+                    $('#ctplayer_'+ctRow).append("<td><span style='color: rgb(41,144,216)'>" + scoreboard["players"][key]["kills"] + "</span></td>");
+                    $('#ctplayer_'+ctRow).append("<td><span style='color: rgb(41,144,216)'>" + scoreboard["players"][key]["deaths"] + "</span></td>");
+
+                    var kd = 0;
+                    var kills = scoreboard["players"][key]["kills"];
+                    var deaths = scoreboard["players"][key]["deaths"];
+                    if(scoreboard["players"][key]["deaths"] != 0)
+                        kd = parseInt(kills)/parseInt(deaths);
+                    else
+                        kd = parseInt(kills);
+                    kd = kd.toFixed(2);
+
+                    $('#ctplayer_'+ctRow).append("<td><span style='color: rgb(41,144,216)'>" + kd + "</span></td>");
+                }
+
+                if(scoreboard["players"][key]["mvp"] > 0){
+                    $('#ctplayer_'+ctRow).append("<td>&#x2b50;<sup style='color: rgb(240,180,18)'>" + scoreboard["players"][key]["mvp"] + "</sup></td>");
+                }
+                else{
+                    $('#ctplayer_'+ctRow).append("<td></td>");
+                }
+            }
+        }
+
+        //Update T Player list.
+        $('.t-players').empty();
+        $('.t-player').empty();
+        var tRow = 0;
+        for (const key of Object.keys(scoreboard["players"])){
+            if(scoreboard["players"][key]["team"] == '2'){
+                tRow += 1;
+                $('.t-players').append("<tr id='tplayer_" + tRow + "' class='t-player' style='width: 100%;'></tr>");
+                if (!scoreboard["players"][key]["alive"]){
+                    $('#tplayer_'+tRow).append("<td></td>");
+                    if(scoreboard["players"][key]["tag"]){
+                        $('#tplayer_'+tRow).append("<td><span style='color: #7a8288'>" + scoreboard["players"][key]["tag"] + "</span></td>");
+                    }
+                    else{
+                        $('#tplayer_'+tRow).append("<td></td>");
+                    }
+                    $('#tplayer_'+tRow).append("<td><span style='color: #7a8288'>" + scoreboard["players"][key]["name"] + "</span></td>");
+                    $('#tplayer_'+tRow).append("<td>&#x1f480;</td>");
+                    $('#tplayer_'+tRow).append("<td><span style='color: #7a8288'>" + scoreboard["players"][key]["kills"] + "</span></td>");
+                    $('#tplayer_'+tRow).append("<td><span style='color: #7a8288'>" + scoreboard["players"][key]["deaths"] + "</span></td>");
+
+                    var kd = 0;
+                    var kills = scoreboard["players"][key]["kills"];
+                    var deaths = scoreboard["players"][key]["deaths"];
+                    if(scoreboard["players"][key]["deaths"] != 0)
+                        kd = parseInt(kills)/parseInt(deaths);
+                    else
+                        kd = parseInt(kills);
+                    kd = kd.toFixed(2);
+
+                    $('#tplayer_'+tRow).append("<td><span style='color: #7a8288'>" + kd + "</span></td>");
+                }
+                else{
+                    $('#tplayer_'+tRow).append("<td></td>");
+                    if(scoreboard["players"][key]["tag"]){
+                        $('#tplayer_'+tRow).append("<td><span style='color: rgb(216,144,41)'>" + scoreboard["players"][key]["tag"] + "</span></td>");
+                    }
+                    else{
+                        $('#tplayer_'+tRow).append("<td></td>");
+                    }
+                    $('#tplayer_'+tRow).append("<td><span style='color: rgb(216,144,41)'>" + scoreboard["players"][key]["name"] + "</span></td>");
+                    $('#tplayer_'+tRow).append("<td></td>");
+                    $('#tplayer_'+tRow).append("<td><span style='color: rgb(216,144,41)'>" + scoreboard["players"][key]["kills"] + "</span></td>");
+                    $('#tplayer_'+tRow).append("<td><span style='color: rgb(216,144,41)'>" + scoreboard["players"][key]["deaths"] + "</span></td>");
+
+                    var kd = 0;
+                    var kills = scoreboard["players"][key]["kills"];
+                    var deaths = scoreboard["players"][key]["deaths"];
+                    if(scoreboard["players"][key]["deaths"] != 0)
+                        kd = parseInt(kills)/parseInt(deaths);
+                    else
+                        kd = parseInt(kills);
+                    kd = kd.toFixed(2);
+
+                    $('#tplayer_'+tRow).append("<td><span style='color: rgb(216,144,41)'>" + kd + "</span></td>");
+                }
+
+                if(scoreboard["players"][key]["mvp"] > 0){
+                    $('#tplayer_'+tRow).append("<td>&#x2b50;<sup style='color: rgb(240,180,18)'>" + scoreboard["players"][key]["mvp"] + "</sup></td>");
+                }
+                else{
+                    $('#tplayer_'+tRow).append("<td></td>");
+                }
+            }
+        }
+    }
+
+    $(function(){
+
+        var socket = new WebSocket('ws://' + window.location.host + '/ws' + window.location.pathname +  '/?session_key={{request.session.session_key}}');
+
+        socket.onmessage = function message(event){
+            var data = JSON.parse(event.data);
+
+            var msg = data["message"];
+            var cmd = data["cmd"];
+
+            if(msg !== undefined){
+                console.log(msg);
+            }
+
+            if(cmd !== undefined){
+                var log_entry = data.payload.pretty_print;
+
+                //Update the Server Logs on the webpage.
+                // If user is scrolled to bottom and the logs then update, the user is scrolled to bottom.
+                if($(".logarea").scrollTop() + $(".logarea").innerHeight() == $(".logarea")[0].scrollHeight){
+                    $('.logarea').append("<div>" + log_entry +"</div>");
+                    $('.logarea').scrollTop($(".logarea")[0].scrollHeight);
+                }
+                else{
+                    $('.logarea').append("<div>" + log_entry +"</div>");
+                }
+
+                if(cmd == "gs-stats-liveupdate"){
+                    console.log(data);
+                    console.log(scoreboard);
+                    updateScoreboard(data, data.payload.tag);
+                }
+            }
+        };
+
+        socket.onopen = function open() {
+          this.send('WebSockets connection created.');
+        };
+
+
+        if (socket.readyState == WebSocket.OPEN) {
+          socket.onopen();
+        }
+
+    });
+    </script>
+{% endblock afterscript %}

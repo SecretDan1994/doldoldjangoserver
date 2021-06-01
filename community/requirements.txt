@@ -79,7 +79,7 @@ traitlets==4.3.2
 Twisted==17.1.0
 txaio==2.7.1
 typing==3.6.1
-urllib3==1.22
+urllib3==1.26.5
 uWSGI==2.0.15
 vdf==2.3
 vine==1.1.3
